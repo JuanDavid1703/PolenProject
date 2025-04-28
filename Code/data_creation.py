@@ -68,7 +68,7 @@ class Data_creation():
     
     
     def data_photo_collection(self, photos_list: list, color_space: str, sav:bool, sav_name: str, sav_path:str,croped_rate=0.1,
-                            width_image=660, high_iamge=500, tr_rate = 1.05, c_rate = 1.15, disk_cleaning: int = 5):
+                            width_image=660, high_image=500, tr_rate = 1.05, c_rate = 1.15, disk_cleaning: int = 5):
         # Color space posibilities ["uv", "Luv", "HS", "HSV"]
         
         cleaning_image=Cleaning_image(self.groups, seed= self.seed)
@@ -76,7 +76,7 @@ class Data_creation():
         if color_space=="Luv":
             cleaned_photos_array=np.array([[[255,  96, 136]]])
             for k, photo in enumerate(photos_list):
-                cleaned_image, _, _=cleaning_image.segm_polen(croped_rate=croped_rate, width_image=width_image, high_iamge=high_iamge,
+                cleaned_image, _, _=cleaning_image.segm_polen(croped_rate=croped_rate, width_image=width_image, high_image=high_image,
                                         path_image=photo, tr_rate=tr_rate, c_rate=c_rate, disk_cleaning=disk_cleaning)
                 Luv_image=self.get_LUV_image(cleaned_image).reshape(-1,3)
                 cleaned_photos_array=np.concatenate([cleaned_photos_array,Luv_image])
@@ -84,7 +84,7 @@ class Data_creation():
         if color_space=="uv":
             cleaned_photos_array=np.array([[[96, 136]]])
             for k, photo in enumerate(photos_list):
-                cleaned_image, _, _=cleaning_image.segm_polen(croped_rate=croped_rate, width_image=width_image, high_iamge=high_iamge,
+                cleaned_image, _, _=cleaning_image.segm_polen(croped_rate=croped_rate, width_image=width_image, high_image=high_image,
                                         path_image=photo, tr_rate=tr_rate, c_rate=c_rate, disk_cleaning=disk_cleaning)
                 uv_image=self.get_LUV_image(cleaned_image)[:,:,1:].reshape(-1,2)
                 cleaned_photos_array=np.concatenate([cleaned_photos_array,uv_image],axis=1)
@@ -92,7 +92,7 @@ class Data_creation():
         if color_space=="HSV":
             cleaned_photos_array=np.array([[[0,0,254]]])
             for k, photo in enumerate(photos_list):
-                cleaned_image, _, _=cleaning_image.segm_polen(croped_rate=croped_rate, width_image=width_image, high_iamge=high_iamge,
+                cleaned_image, _, _=cleaning_image.segm_polen(croped_rate=croped_rate, width_image=width_image, high_image=high_image,
                                         path_image=photo, tr_rate=tr_rate, c_rate=c_rate, disk_cleaning=disk_cleaning)
                 HSV_image=self.get_HSV_image(cleaned_image).reshape(-1,3)
                 cleaned_photos_array=np.concatenate([cleaned_photos_array,HSV_image],axis=1)
@@ -100,7 +100,7 @@ class Data_creation():
         if color_space=="HS":
             cleaned_photos_array=np.array([[[0,0]]])
             for k, photo in enumerate(photos_list):
-                cleaned_image, _, _=cleaning_image.segm_polen(croped_rate=croped_rate, width_image=width_image, high_iamge=high_iamge,
+                cleaned_image, _, _=cleaning_image.segm_polen(croped_rate=croped_rate, width_image=width_image, high_image=high_image,
                                         path_image=photo, tr_rate=tr_rate, c_rate=c_rate, disk_cleaning=disk_cleaning)
                 HS_image=self.get_HSV_image(cleaned_image)[:,:,:2].reshape(-1,2)
                 cleaned_photos_array=np.concatenate([cleaned_photos_array,HS_image],axis=1)
