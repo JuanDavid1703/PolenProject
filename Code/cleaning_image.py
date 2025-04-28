@@ -24,7 +24,7 @@ class Cleaning_image():
         color_center=np.uint8(model.cluster_centers_)
         color_label=model.labels_
         inertia=model.inertia_
-        image_flatten = color_center[label.flatten()]
+        image_flatten = color_center[color_label.flatten()]
         image_quantized= image_flatten.reshape(image_noquantized.shape)
         return image_quantized, color_label, color_center ,inertia
         
