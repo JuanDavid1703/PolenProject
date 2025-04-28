@@ -44,25 +44,25 @@ class Cleaning_image():
     
     
     
-    def segm_polen(self, croped_rate:float, width_image: int ,high_iamge: int , path_image: str,
+    def segm_polen(self, croped_rate:float, width_image: int ,high_image: int , path_image: str,
                    tr_rate=1.05,c_rate=1.15, disk_cleaning=5):
         try:
             img=io.imread(path_image)
             a,b,_=img.shape
             if a>b:
                 img=np.transpose(img,(1,0,2))
-                img= resize(img, (high_iamge, width_image),order=1, preserve_range=True)
+                img= resize(img, (high_image, width_image),order=1, preserve_range=True)
 
         except:
             a,b,_=path_image.shape
             if a>b:
                 path_image=np.transpose(path_image,(1,0,2))
-                img= resize(path_image, (high_iamge, width_image),order=1, preserve_range=True)
+                img= resize(path_image, (high_image, width_image),order=1, preserve_range=True)
 
 
-        i=int(croped_rate*high_iamge)
+        i=int(croped_rate*high_image)
         ima=[]
-        while i < (1-croped_rate)*high_iamge:
+        while i < (1-croped_rate)*high_image:
             j = int(croped_rate*width_image)
             while j < (1-croped_rate)*width_image:
                 r, g, b = np.uint8(img[i, j,:3])
@@ -71,7 +71,7 @@ class Cleaning_image():
             i+=1
 
         new_width_image=int((1-2*croped_rate)*width_image)
-        new_high_image=int((1-2*croped_rate)*high_iamge)
+        new_high_image=int((1-2*croped_rate)*high_image)
         resized_image=np.reshape(ima,(new_high_image,new_width_image,3))
 
         #Computes entropy to quantifies disorder.
