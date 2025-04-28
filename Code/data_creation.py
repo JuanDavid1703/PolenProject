@@ -67,7 +67,7 @@ class Data_creation():
     
     
     
-    def data_photo_collection(self, photos_list: list, color_space: str, sav:bool, sav_name: str, sav_path:str,croped_rate=1,
+    def data_photo_collection(self, photos_list: list, color_space: str, sav:bool, sav_name: str, sav_path:str,croped_rate=0.1,
                             width_image=660, high_iamge=500, tr_rate = 1.05, c_rate = 1.15, disk_cleaning: int = 5):
         # Color space posibilities ["uv", "Luv", "HS", "HSV"]
         
