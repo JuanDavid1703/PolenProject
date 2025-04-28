@@ -61,18 +61,11 @@ class Cleaning_image():
 
 
         i=int(croped_rate*high_image)
-        ima=[]
-        while i < (1-croped_rate)*high_image:
-            j = int(croped_rate*width_image)
-            while j < (1-croped_rate)*width_image:
-                r, g, b = np.uint8(img[i, j,:3])
-                ima.append([r,g,b])
-                j+=1
-            i+=1
+        j=int(croped_rate*width_image)
 
-        new_width_image=int((1-2*croped_rate)*width_image)
-        new_high_image=int((1-2*croped_rate)*high_image)
-        resized_image=np.reshape(ima,(new_high_image,new_width_image,3))
+        new_width_image=img.shape[1]
+        new_high_image=img.shape[0]
+        resized_image=np.uint8(img[i:new_high_image-i,j :new_width_image-j])
 
         #Computes entropy to quantifies disorder.
         #STUDY SIZE OF THE MASK
