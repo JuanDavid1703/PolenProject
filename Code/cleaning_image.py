@@ -60,15 +60,21 @@ class Cleaning_image():
                 img= resize(path_image, (high_image, width_image),order=1, preserve_range=True)
 
 
+        img= resize(img, (high_image, width_image),order=1, preserve_range=True,)
+
         i=int(croped_rate*high_image)
         j=int(croped_rate*width_image)
 
-        new_width_image=img.shape[1]
-        new_high_image=img.shape[0]
-        resized_image=np.uint8(img[i:new_high_image-i,j :new_width_image-j])
+        width_image=img.shape[1]
+        high_image=img.shape[0]
+        resized_image=np.uint8(img[i:high_image-i,j :width_image-j])
+
+        new_high_image=resized_image.shape[0]
+        new_width_image=resized_image.shape[1]
+
 
         #Computes entropy to quantifies disorder.
-        #STUDY SIZE OF THE MASK
+            #STUDY SIZE OF THE MASK
         entropy_imgage = entropy(resized_image[:,:,0], disk(disk_cleaning),)
 
 
@@ -81,12 +87,11 @@ class Cleaning_image():
         # TODO: POLEN CAN OVERLAP LINES MORPHOLOGICAL OPERATORS MAY HELP OR SOME COLOR INFORMATION
         # Compute conected components in the binary image
         label_image = label(binary,background=True)
-        image_label_overlay = label2rgb(label_image, image=binary)
 
         # Extract the contected component with the largest area
         maskRegion = np.full_like(label_image,0)
         for region in regionprops(label_image):
-            # take regions with large enough areas
+           # take regions with large enough areas
             if region.area >= 100:
                 maskRegion[region.coords[:,0],region.coords[:,1]] = 1
 
@@ -96,7 +101,7 @@ class Cleaning_image():
             j = 0
             while j < new_width_image:
                 if maskRegion[i,j]==0:
-                    ima_crop[i,j,:] = img[i, j,:]
+                    ima_crop[i,j,:] = resized_image[i, j,:]
                 j+=1
             i+=1
 
