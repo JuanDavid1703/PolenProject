@@ -119,56 +119,28 @@ class Data_creation():
             
             
     
-    def color_represent_data(self, cleaned_photos_array, sav:bool, sav_name: None, sav_path:None, data_reduction:bool, rate_data_reduction=0.5)->tuple:
+def color_represent_data(self, cleaned_photos_array, sub_cluster_rate:float, 
+                             sub_data_rate:float, max_iter_minikmeans:int, max_iter_kmeans:int, iterations:int, 
+                             sav:bool, sav_name= None, sav_path=None)->tuple:
         
         dimension=cleaned_photos_array.shape
         photo_quantiy=dimension[0]
-        if data_reduction:
-            n_clusters=int(photo_quantiy*(1-rate_data_reduction))
-            print("New dimension image:", (n_clusters,dimension[1]))
-            if photo_quantiy<1000000:
-                
-                model_reduction=MiniBatchKMeans(n_clusters=n_clusters,max_iter=150,random_state=self.seed,batch_size=2**12).fit(cleaned_photos_array)
-                data_reduced=np.array(model_reduction.cluster_centers_,dtype=np.uint8)
-
-            
-            elif photo_quantiy<10000000:
-                data_reduced=np.uint8([[0]*dimension[1]])
-                for i in range(5):
-                    print(f"{i+1}-ésima iteración de 5")
-                    new_photo_quantity=int(photo_quantiy*0.2)
-                    index_group=np.random.choice(range(photo_quantiy), size=n_clusters, replace=False)
-                    model_reduction=MiniBatchKMeans(n_clusters=new_photo_quantity,max_iter=100,random_state=self.seed,batch_size=2**15,).fit(cleaned_photos_array[index_group])
-                    data_reduced=np.concatenate([data_reduced,np.array(model_reduction.cluster_centers_,dtype=np.uint8)])
-                data_reduced=data_reduced[1:]
-            
-            elif photo_quantiy<25000000:
-                data_reduced=np.uint8([[0]*dimension[1]])
-                for i in range(10):
-                    print(f"{i+1}-ésima iteración de 10")
-                    new_photo_quantity=int(photo_quantiy*0.1)
-                    index_group=np.random.choice(range(photo_quantiy), size=n_clusters, replace=False)
-                    model_reduction=MiniBatchKMeans(n_clusters=new_photo_quantity,max_iter=75,random_state=self.seed,batch_size=2**16).fit(cleaned_photos_array[index_group])
-                    data_reduced=np.concatenate([data_reduced,np.array(model_reduction.cluster_centers_,dtype=np.uint8)])
-                data_reduced=data_reduced[1:]
-            
-            
-            else:
-                data_reduced=np.uint8([[0]*dimension[1]])
-                for i in range(20):
-                    print(f"{i+1}-ésima iteración de 20")
-                    new_photo_quantity=int(photo_quantiy*0.05)
-                    index_group=np.random.choice(range(photo_quantiy), size=n_clusters, replace=False)
-                    model_reduction=MiniBatchKMeans(n_clusters=new_photo_quantity,max_iter=50,random_state=self.seed,batch_size=1024,).fit(cleaned_photos_array[index_group])
-                    data_reduced=np.concatenate([data_reduced,np.array(model_reduction.cluster_centers_,dtype=np.uint8)])
-                data_reduced=data_reduced[1:]
-            
-            
-            model_center_representation=KMeans(n_clusters=self.groups+1,max_iter=500,random_state=self.seed).fit(data_reduced)
+        if photo_quantiy<10000000:
+            model_center_representation=MiniBatchKMeans(n_clusters=self.groups+1,max_iter=max_iter_minikmeans,random_state=self.seed,batch_size=2**11).fit(cleaned_photos_array)
             centers_representation=np.uint8(model_center_representation.cluster_centers_)
+
         
         else:
-            model_center_representation=KMeans(n_clusters=self.groups+1,max_iter=500,random_state=self.seed).fit(cleaned_photos_array)
+            data_reduced=np.uint8([[0]*dimension[1]])
+            for i in range(iterations):
+                print(f"{i+1}-th iteration of {iterations}")
+                sub_data=int(photo_quantiy*sub_data_rate)
+                sub_cluster=int(photo_quantiy*sub_cluster_rate)
+                index_group=np.random.choice(range(photo_quantiy), size=sub_data, replace=False)
+                sub_model=MiniBatchKMeans(n_clusters=sub_cluster,max_iter=max_iter_minikmeans,random_state=self.seed,batch_size=2**11).fit(cleaned_photos_array[index_group])
+                data_reduced=np.concatenate([data_reduced,np.array(sub_model.cluster_centers_,dtype=np.uint8)])
+            data_reduced=data_reduced[1:]
+            model_center_representation=KMeans(n_clusters=self.groups+1,max_iter=max_iter_kmeans,random_state=self.seed).fit(data_reduced)
             centers_representation=np.uint8(model_center_representation.cluster_centers_)
             
         
