@@ -119,27 +119,69 @@ class Data_creation():
             
             
     
-    def color_represent_data(self, cleaned_photos_array, sav:bool, sav_name: str, sav_path:str,  rate_data_reduction=0)->tuple:
+    def color_represent_data(self, cleaned_photos_array, sav:bool, sav_name: None, sav_path:None, data_reduction:bool, rate_data_reduction=0.5)->tuple:
         
         dimension=cleaned_photos_array.shape
         photo_quantiy=dimension[0]
-        quantity_reduction=int((1-rate_data_reduction)*photo_quantiy)
-        model_reduction=MiniBatchKMeans(n_clusters=quantity_reduction,max_iter=300,random_state=self.seed,batch_size=1024).fit(cleaned_photos_array)
-        data_reduced=np.array(model_reduction.cluster_centers_,dtype=np.uint8)
+        if data_reduction:
+            n_clusters=int(photo_quantiy*(1-rate_data_reduction))
+            print(n_clusters)
+            if photo_quantiy<1000000:
+                
+                model_reduction=MiniBatchKMeans(n_clusters=n_clusters,max_iter=150,random_state=self.seed,batch_size=2**12).fit(cleaned_photos_array)
+                data_reduced=np.array(model_reduction.cluster_centers_,dtype=np.uint8)
+
+            
+            elif photo_quantiy<10000000:
+                data_reduced=np.uint8([[0]*dimension[1]])
+                for i in range(5):
+                    print(f"{i+1}-ésima iteración de 5")
+                    new_photo_quantity=int(photo_quantiy*0.2)
+                    index_group=np.random.choice(range(photo_quantiy), size=n_clusters, replace=False)
+                    model_reduction=MiniBatchKMeans(n_clusters=new_photo_quantity,max_iter=100,random_state=self.seed,batch_size=2**15,).fit(cleaned_photos_array[index_group])
+                    data_reduced=np.concatenate([data_reduced,np.array(model_reduction.cluster_centers_,dtype=np.uint8)])
+                data_reduced=data_reduced[1:]
+            
+            elif photo_quantiy<25000000:
+                data_reduced=np.uint8([[0]*dimension[1]])
+                for i in range(10):
+                    print(f"{i+1}-ésima iteración de 10")
+                    new_photo_quantity=int(photo_quantiy*0.1)
+                    index_group=np.random.choice(range(photo_quantiy), size=n_clusters, replace=False)
+                    model_reduction=MiniBatchKMeans(n_clusters=new_photo_quantity,max_iter=75,random_state=self.seed,batch_size=2**16).fit(cleaned_photos_array[index_group])
+                    data_reduced=np.concatenate([data_reduced,np.array(model_reduction.cluster_centers_,dtype=np.uint8)])
+                data_reduced=data_reduced[1:]
+            
+            
+            else:
+                data_reduced=np.uint8([[0]*dimension[1]])
+                for i in range(20):
+                    print(f"{i+1}-ésima iteración de 20")
+                    new_photo_quantity=int(photo_quantiy*0.05)
+                    index_group=np.random.choice(range(photo_quantiy), size=n_clusters, replace=False)
+                    model_reduction=MiniBatchKMeans(n_clusters=new_photo_quantity,max_iter=50,random_state=self.seed,batch_size=1024,).fit(cleaned_photos_array[index_group])
+                    data_reduced=np.concatenate([data_reduced,np.array(model_reduction.cluster_centers_,dtype=np.uint8)])
+                data_reduced=data_reduced[1:]
+            
+            
+            model_center_representation=KMeans(n_clusters=self.groups+1,max_iter=500,random_state=self.seed).fit(data_reduced)
+            centers_representation=np.uint8(model_center_representation.cluster_centers_)
         
-        model_center_representation=KMeans(n_clusters=self.groups+1,max_iter=500,random_state=self.seed).fit(data_reduced)
-        centers_representation=np.uint8(model_center_representation.cluster_centers_)
+        else:
+            model_center_representation=KMeans(n_clusters=self.groups+1,max_iter=500,random_state=self.seed).fit(cleaned_photos_array)
+            centers_representation=np.uint8(model_center_representation.cluster_centers_)
+            
         
         if sav:
             try:
                 pick.dump(model_center_representation, open(sav_path+sav_name+".sav", 'wb'))
-                print(f"The file was saved in .npz format in the path {sav_path}")
+                print(f"The file was saved in .sav format in the path {sav_path}")
                 return (model_center_representation,centers_representation)
             except ValueError:
                 print("Check the path. Try to save it by yourself or ejecut again this function.")
                 return (model_center_representation,centers_representation)
         else:
-            return (model_center_representation,centers_representation)
+            return (model_center_representation, centers_representation)
 
 
     def create_df_control(self,  quantity_samples_per_producer_per_visit: list[list], producers: list, 
