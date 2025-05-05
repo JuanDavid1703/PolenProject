@@ -125,7 +125,7 @@ class Data_creation():
         photo_quantiy=dimension[0]
         if data_reduction:
             n_clusters=int(photo_quantiy*(1-rate_data_reduction))
-            print(n_clusters)
+            print("New dimension image:", (n_clusters,dimension[1]))
             if photo_quantiy<1000000:
                 
                 model_reduction=MiniBatchKMeans(n_clusters=n_clusters,max_iter=150,random_state=self.seed,batch_size=2**12).fit(cleaned_photos_array)
