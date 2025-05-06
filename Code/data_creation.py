@@ -13,34 +13,15 @@ class Data_creation():
         self.groups=botanical_species
         self.seed=seed
     
-    def characteristic_vector_HSV(self, dimension_image: int, labes_colors: list, center_color_representation, cleaning_level=15):
+    def charac_vector(self, dimension_image: int, labes_colors: list, center_color_representation, color_vector_out, cleaning_level=15):
         # dimension_image can take 2 or 3, depend on the color space you are working in
+        # withe in LUV=np.array([255,  96, 136])
+        # withe in HSV=np.array([0,0,254])
         
         proportion_vector,_=histogram(labes_colors,bins=len(center_color_representation),density=True)
-        try:
-            if dimension_image==3:
-                rate=proportion_vector[norm(center_color_representation-array([0,0,254]),axis=1)<=cleaning_level ][0]
-            elif dimension_image==2:
-                rate=proportion_vector[norm(center_color_representation,axis=1)<=cleaning_level ][0]
-            pos=where(proportion_vector==rate)[0][0]
-            image_characteristic_vector=delete(proportion_vector,pos)
-            image_characteristic_vector=image_characteristic_vector/sum(image_characteristic_vector)
-            return image_characteristic_vector        
-        except ValueError:
-            print("Check de image dimension")
-         
-     
-    
-            
-    def charac_vector_Luv(self, dimension_image: int, labes_colors: list, center_color_representation, cleaning_level=15):
-        # dimension_image can take 2 or 3, depend on the color space you are working in
         
-        proportion_vector,_=histogram(labes_colors,bins=len(center_color_representation),density=True)
         try:
-            if dimension_image==3:
-                rate=proportion_vector[norm(center_color_representation-array([255,  96, 136]),axis=1)<=cleaning_level ][0]
-            elif dimension_image==2:
-                rate=proportion_vector[norm(center_color_representation-array([ 96,136]),axis=1)<=cleaning_level ][0]
+            rate=proportion_vector[norm(center_color_representation-color_vector_out,axis=1)<=cleaning_level ][0] 
             pos=where(proportion_vector==rate)[0][0]
             image_characteristic_vector=delete(proportion_vector,pos)
             image_characteristic_vector=image_characteristic_vector/sum(image_characteristic_vector)
